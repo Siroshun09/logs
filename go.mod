@@ -1,3 +1,3 @@
 module github.com/Siroshun09/logs
 
-go 1.22
+go 1.24

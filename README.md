@@ -9,7 +9,7 @@ A Go library that provides a simple interface and functions for logging.
 
 ## Requirements
 
-- Go 1.22+
+- Go 1.24+
 
 ## Installation
 
@@ -21,4 +21,4 @@ go get github.com/Siroshun09/logs
 
 This project is under the Apache License version 2.0. Please see [LICENSE](LICENSE) for more info.
 
-Copyright © 2024, Siroshun09
+Copyright © 2024-2025, Siroshun09
