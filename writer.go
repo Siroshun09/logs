@@ -7,14 +7,17 @@ import (
 	"os"
 )
 
+// NewStdoutLogger creates a Logger that writes to os.Stdout.
 func NewStdoutLogger(debug bool) Logger {
 	return NewLoggerWithWriter(os.Stdout, true, debug)
 }
 
+// NewStderrLogger creates a Logger that writes to os.Stderr.
 func NewStderrLogger(debug bool) Logger {
 	return NewLoggerWithWriter(os.Stderr, true, debug)
 }
 
+// NewLoggerWithWriter creates a Logger that writes to the given io.Writer.
 func NewLoggerWithWriter(writer io.Writer, printLevel bool, debug bool) Logger {
 	return &writerLogger{
 		writer:     writer,
