@@ -14,6 +14,18 @@ jobs:
     with:
       upload-results: true
       go-version: 1.25
+  test-1_24-mock:
+    uses: Siroshun09/gh-actions-workflows/.github/workflows/go-test.yml@v1
+    with:
+      working-dir: "./logmock"
+      upload-results: true
+      go-version: 1.24
+  test-1_25-mock:
+    uses: Siroshun09/gh-actions-workflows/.github/workflows/go-test.yml@v1
+    with:
+      working-dir: "./logmock"
+      upload-results: true
+      go-version: 1.25
   lint:
     uses: Siroshun09/gh-actions-workflows/.github/workflows/go-lint.yml@v1
     with:
