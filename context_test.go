@@ -3,6 +3,7 @@ package logs
 import (
 	"context"
 	"errors"
+	"fmt"
 	"log/slog"
 	"reflect"
 	"testing"
@@ -73,8 +74,16 @@ func (r recordingLogger) Warn(_ context.Context, err error) {
 	r.lastLog.log = warnLog(err)
 }
 
+func (r recordingLogger) Warnf(_ context.Context, format string, args ...any) {
+	r.lastLog.log = warnLog(fmt.Errorf(format, args...))
+}
+
 func (r recordingLogger) Error(_ context.Context, err error) {
 	r.lastLog.log = errorLog(err)
+}
+
+func (r recordingLogger) Errorf(_ context.Context, format string, args ...any) {
+	r.lastLog.log = errorLog(fmt.Errorf(format, args...))
 }
 
 func TestLog(t *testing.T) {
@@ -110,11 +119,25 @@ func TestLog(t *testing.T) {
 			expectedLog: warnLog(warn),
 		},
 		{
+			name: "success: warnf",
+			f: func(ctx context.Context) {
+				Warnf(ctx, "warnf: %s", "warnf")
+			},
+			expectedLog: warnLog(fmt.Errorf("warnf: %s", "warnf")),
+		},
+		{
 			name: "success: error",
 			f: func(ctx context.Context) {
 				Error(ctx, err)
 			},
 			expectedLog: errorLog(err),
+		},
+		{
+			name: "success: errorf",
+			f: func(ctx context.Context) {
+				Errorf(ctx, "errorf: %s", "errorf")
+			},
+			expectedLog: errorLog(fmt.Errorf("errorf: %s", "errorf")),
 		},
 	}
 	for _, tt := range tests {

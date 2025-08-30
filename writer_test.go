@@ -314,3 +314,87 @@ func Test_writerLogger_Error(t *testing.T) {
 		})
 	}
 }
+
+func Test_writerLogger_Warnf(t *testing.T) {
+	tests := []struct {
+		name         string
+		printLevel   bool
+		format       string
+		args         []any
+		expectedLogs []string
+	}{
+		{
+			name:         "printLevel: true",
+			printLevel:   true,
+			format:       "warning %s %d",
+			args:         []any{"log", 1},
+			expectedLogs: []string{"WARN: warning log 1"},
+		},
+		{
+			name:         "printLevel: false",
+			printLevel:   false,
+			format:       "warning %s %d",
+			args:         []any{"log", 2},
+			expectedLogs: []string{"warning log 2"},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			buf := strings.Builder{}
+			w := &writerLogger{
+				writer:     &buf,
+				printLevel: tt.printLevel,
+			}
+			w.Warnf(context.Background(), tt.format, tt.args...)
+			got := strings.Split(buf.String(), "\n")
+			if 0 < len(got) {
+				got = got[:len(got)-1] // remove trailing line
+			}
+			if !reflect.DeepEqual(got, tt.expectedLogs) {
+				t.Errorf("Warnf() = %v, want %v", got, tt.expectedLogs)
+			}
+		})
+	}
+}
+
+func Test_writerLogger_Errorf(t *testing.T) {
+	tests := []struct {
+		name         string
+		printLevel   bool
+		format       string
+		args         []any
+		expectedLogs []string
+	}{
+		{
+			name:         "printLevel: true",
+			printLevel:   true,
+			format:       "error %s %d",
+			args:         []any{"log", 1},
+			expectedLogs: []string{"ERROR: error log 1"},
+		},
+		{
+			name:         "printLevel: false",
+			printLevel:   false,
+			format:       "error %s %d",
+			args:         []any{"log", 2},
+			expectedLogs: []string{"error log 2"},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			buf := strings.Builder{}
+			w := &writerLogger{
+				writer:     &buf,
+				printLevel: tt.printLevel,
+			}
+			w.Errorf(context.Background(), tt.format, tt.args...)
+			got := strings.Split(buf.String(), "\n")
+			if 0 < len(got) {
+				got = got[:len(got)-1] // remove trailing line
+			}
+			if !reflect.DeepEqual(got, tt.expectedLogs) {
+				t.Errorf("Errorf() = %v, want %v", got, tt.expectedLogs)
+			}
+		})
+	}
+}

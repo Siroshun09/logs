@@ -98,12 +98,32 @@ func Test_slogDefaultLogger_Log(t *testing.T) {
 			},
 		},
 		{
+			name: "success: warnf",
+			f: func(ctx context.Context) {
+				logger.Warnf(ctx, "warnf: %s", "arg")
+			},
+			expectedRecord: slog.Record{
+				Message: "warnf: arg",
+				Level:   slog.LevelWarn,
+			},
+		},
+		{
 			name: "success: error",
 			f: func(ctx context.Context) {
 				logger.Error(ctx, errors.New("error"))
 			},
 			expectedRecord: slog.Record{
 				Message: "error",
+				Level:   slog.LevelError,
+			},
+		},
+		{
+			name: "success: errorf",
+			f: func(ctx context.Context) {
+				logger.Errorf(ctx, "errorf: %s", "arg")
+			},
+			expectedRecord: slog.Record{
+				Message: "errorf: arg",
 				Level:   slog.LevelError,
 			},
 		},

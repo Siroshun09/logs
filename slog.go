@@ -2,6 +2,7 @@ package logs
 
 import (
 	"context"
+	"fmt"
 	"log/slog"
 )
 
@@ -33,6 +34,14 @@ func (s slogDefaultLogger) Warn(ctx context.Context, err error) {
 	s.getSlogLogger().WarnContext(ctx, err.Error())
 }
 
+func (s slogDefaultLogger) Warnf(ctx context.Context, format string, args ...any) {
+	s.getSlogLogger().WarnContext(ctx, fmt.Sprintf(format, args...))
+}
+
 func (s slogDefaultLogger) Error(ctx context.Context, err error) {
 	s.getSlogLogger().ErrorContext(ctx, err.Error())
+}
+
+func (s slogDefaultLogger) Errorf(ctx context.Context, format string, args ...any) {
+	s.getSlogLogger().ErrorContext(ctx, fmt.Sprintf(format, args...))
 }

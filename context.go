@@ -38,7 +38,17 @@ func Warn(ctx context.Context, err error) {
 	FromContext(ctx).Warn(ctx, err)
 }
 
+// Warnf logs an error as warn level using Logger obtained from FromContext.
+func Warnf(ctx context.Context, format string, args ...any) {
+	FromContext(ctx).Warnf(ctx, format, args...)
+}
+
 // Error logs an error as error level using Logger obtained from FromContext.
 func Error(ctx context.Context, err error) {
 	FromContext(ctx).Error(ctx, err)
+}
+
+// Errorf logs an error as error level using Logger obtained from FromContext.
+func Errorf(ctx context.Context, format string, args ...any) {
+	FromContext(ctx).Errorf(ctx, format, args...)
 }

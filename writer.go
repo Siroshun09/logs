@@ -47,8 +47,16 @@ func (w *writerLogger) Warn(_ context.Context, err error) {
 	w.println("WARN", err.Error())
 }
 
+func (w *writerLogger) Warnf(_ context.Context, format string, args ...any) {
+	w.println("WARN", fmt.Sprintf(format, args...))
+}
+
 func (w *writerLogger) Error(_ context.Context, err error) {
 	w.println("ERROR", err.Error())
+}
+
+func (w *writerLogger) Errorf(_ context.Context, format string, args ...any) {
+	w.println("ERROR", fmt.Sprintf(format, args...))
 }
 
 func (w *writerLogger) println(level string, msg string) {
