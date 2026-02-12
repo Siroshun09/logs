@@ -3,7 +3,6 @@ package logs
 import (
 	"context"
 	"errors"
-	"fmt"
 	"log/slog"
 	"reflect"
 	"testing"
@@ -59,85 +58,113 @@ type recordingLogger struct {
 }
 
 type lastLogHolder struct {
-	log any
+	log   any
+	attrs []slog.Attr
 }
 
-func (r recordingLogger) Debug(_ context.Context, msg string) {
+func (r recordingLogger) Debug(_ context.Context, msg string, attrs ...slog.Attr) {
 	r.lastLog.log = debugLog(msg)
+	r.lastLog.attrs = attrs
 }
 
-func (r recordingLogger) Info(_ context.Context, msg string) {
+func (r recordingLogger) Info(_ context.Context, msg string, attrs ...slog.Attr) {
 	r.lastLog.log = infoLog(msg)
+	r.lastLog.attrs = attrs
 }
 
-func (r recordingLogger) Warn(_ context.Context, err error) {
+func (r recordingLogger) Warn(_ context.Context, err error, attrs ...slog.Attr) {
 	r.lastLog.log = warnLog(err)
+	r.lastLog.attrs = attrs
 }
 
-func (r recordingLogger) Warnf(_ context.Context, format string, args ...any) {
-	r.lastLog.log = warnLog(fmt.Errorf(format, args...))
-}
-
-func (r recordingLogger) Error(_ context.Context, err error) {
+func (r recordingLogger) Error(_ context.Context, err error, attrs ...slog.Attr) {
 	r.lastLog.log = errorLog(err)
-}
-
-func (r recordingLogger) Errorf(_ context.Context, format string, args ...any) {
-	r.lastLog.log = errorLog(fmt.Errorf(format, args...))
+	r.lastLog.attrs = attrs
 }
 
 func TestLog(t *testing.T) {
 	lastLog := lastLogHolder{}
-	ctx := WithContext(context.Background(), &recordingLogger{lastLog: &lastLog})
+	ctx := WithContext(t.Context(), &recordingLogger{lastLog: &lastLog})
 	warn := errors.New("warn")
 	err := errors.New("error")
 
 	tests := []struct {
-		name        string
-		f           func(ctx context.Context)
-		expectedLog any
+		name          string
+		f             func(ctx context.Context)
+		expectedLog   any
+		expectedAttrs []slog.Attr
 	}{
 		{
 			name: "success: debug",
 			f: func(ctx context.Context) {
 				Debug(ctx, "debug")
 			},
+			expectedLog:   debugLog("debug"),
+			expectedAttrs: nil,
+		},
+		{
+			name: "success: debug with attrs",
+			f: func(ctx context.Context) {
+				Debug(ctx, "debug", slog.String("key", "value"))
+			},
 			expectedLog: debugLog("debug"),
+			expectedAttrs: []slog.Attr{
+				slog.String("key", "value"),
+			},
 		},
 		{
 			name: "success: info",
 			f: func(ctx context.Context) {
 				Info(ctx, "info")
 			},
+			expectedLog:   infoLog("info"),
+			expectedAttrs: nil,
+		},
+		{
+			name: "success: info with attrs",
+			f: func(ctx context.Context) {
+				Info(ctx, "info", slog.String("key", "value"))
+			},
 			expectedLog: infoLog("info"),
+			expectedAttrs: []slog.Attr{
+				slog.String("key", "value"),
+			},
 		},
 		{
 			name: "success: warn",
 			f: func(ctx context.Context) {
 				Warn(ctx, warn)
 			},
-			expectedLog: warnLog(warn),
+			expectedLog:   warnLog(warn),
+			expectedAttrs: nil,
 		},
 		{
-			name: "success: warnf",
+			name: "success: warn with attrs",
 			f: func(ctx context.Context) {
-				Warnf(ctx, "warnf: %s", "warnf")
+				Warn(ctx, warn, slog.String("key", "value"))
 			},
-			expectedLog: warnLog(fmt.Errorf("warnf: %s", "warnf")),
+			expectedLog: warnLog(warn),
+			expectedAttrs: []slog.Attr{
+				slog.String("key", "value"),
+			},
 		},
 		{
 			name: "success: error",
 			f: func(ctx context.Context) {
 				Error(ctx, err)
 			},
-			expectedLog: errorLog(err),
+			expectedLog:   errorLog(err),
+			expectedAttrs: nil,
 		},
 		{
-			name: "success: errorf",
+			name: "success: error with attrs",
 			f: func(ctx context.Context) {
-				Errorf(ctx, "errorf: %s", "errorf")
+				Error(ctx, err, slog.String("key", "value"))
 			},
-			expectedLog: errorLog(fmt.Errorf("errorf: %s", "errorf")),
+			expectedLog: errorLog(err),
+			expectedAttrs: []slog.Attr{
+				slog.String("key", "value"),
+			},
 		},
 	}
 	for _, tt := range tests {
@@ -145,6 +172,9 @@ func TestLog(t *testing.T) {
 			tt.f(ctx)
 			if !reflect.DeepEqual(tt.expectedLog, lastLog.log) {
 				t.Errorf("lastLogHolder = %v, want %v", lastLog.log, tt.expectedLog)
+			}
+			if !reflect.DeepEqual(tt.expectedAttrs, lastLog.attrs) {
+				t.Errorf("lastLogHolder = %v, want %v", lastLog.attrs, tt.expectedAttrs)
 			}
 		})
 	}

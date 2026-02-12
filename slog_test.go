@@ -66,6 +66,7 @@ func Test_slogDefaultLogger_Log(t *testing.T) {
 		name           string
 		f              func(ctx context.Context)
 		expectedRecord slog.Record
+		expectedAttrs  []slog.Attr
 	}{
 		{
 			name: "success: debug",
@@ -75,6 +76,19 @@ func Test_slogDefaultLogger_Log(t *testing.T) {
 			expectedRecord: slog.Record{
 				Message: "debug",
 				Level:   slog.LevelDebug,
+			},
+		},
+		{
+			name: "success: debug with attrs",
+			f: func(ctx context.Context) {
+				logger.Debug(ctx, "debug", slog.String("key", "value"))
+			},
+			expectedRecord: slog.Record{
+				Message: "debug",
+				Level:   slog.LevelDebug,
+			},
+			expectedAttrs: []slog.Attr{
+				slog.String("key", "value"),
 			},
 		},
 		{
@@ -88,6 +102,19 @@ func Test_slogDefaultLogger_Log(t *testing.T) {
 			},
 		},
 		{
+			name: "success: info with attrs",
+			f: func(ctx context.Context) {
+				logger.Info(ctx, "info", slog.String("key", "value"))
+			},
+			expectedRecord: slog.Record{
+				Message: "info",
+				Level:   slog.LevelInfo,
+			},
+			expectedAttrs: []slog.Attr{
+				slog.String("key", "value"),
+			},
+		},
+		{
 			name: "success: warn",
 			f: func(ctx context.Context) {
 				logger.Warn(ctx, errors.New("warn"))
@@ -98,13 +125,16 @@ func Test_slogDefaultLogger_Log(t *testing.T) {
 			},
 		},
 		{
-			name: "success: warnf",
+			name: "success: warn with attrs",
 			f: func(ctx context.Context) {
-				logger.Warnf(ctx, "warnf: %s", "arg")
+				logger.Warn(ctx, errors.New("warn"), slog.String("key", "value"))
 			},
 			expectedRecord: slog.Record{
-				Message: "warnf: arg",
+				Message: "warn",
 				Level:   slog.LevelWarn,
+			},
+			expectedAttrs: []slog.Attr{
+				slog.String("key", "value"),
 			},
 		},
 		{
@@ -118,27 +148,34 @@ func Test_slogDefaultLogger_Log(t *testing.T) {
 			},
 		},
 		{
-			name: "success: errorf",
+			name: "success: error with attrs",
 			f: func(ctx context.Context) {
-				logger.Errorf(ctx, "errorf: %s", "arg")
+				logger.Error(ctx, errors.New("error"), slog.String("key", "value"))
 			},
 			expectedRecord: slog.Record{
-				Message: "errorf: arg",
+				Message: "error",
 				Level:   slog.LevelError,
+			},
+			expectedAttrs: []slog.Attr{
+				slog.String("key", "value"),
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			tt.f(context.Background())
+			expectedRecord := tt.expectedRecord
+			expectedRecord.AddAttrs(tt.expectedAttrs...)
+
+			tt.f(t.Context())
+
 			lastRecord := handler.lastRecord
 
 			// ignore Time and PC diff
-			lastRecord.Time = tt.expectedRecord.Time
-			lastRecord.PC = tt.expectedRecord.PC
+			lastRecord.Time = expectedRecord.Time
+			lastRecord.PC = expectedRecord.PC
 
-			if !reflect.DeepEqual(tt.expectedRecord, lastRecord) {
-				t.Errorf("lastLogHolder = %v, want %v", lastRecord, tt.expectedRecord)
+			if !reflect.DeepEqual(expectedRecord, lastRecord) {
+				t.Errorf("lastLogHolder = %v, want %v", lastRecord, expectedRecord)
 			}
 		})
 	}

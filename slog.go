@@ -2,7 +2,6 @@ package logs
 
 import (
 	"context"
-	"fmt"
 	"log/slog"
 )
 
@@ -22,26 +21,31 @@ func (s slogDefaultLogger) getSlogLogger() *slog.Logger {
 	return slog.Default()
 }
 
-func (s slogDefaultLogger) Debug(ctx context.Context, msg string) {
-	s.getSlogLogger().DebugContext(ctx, msg)
+func (s slogDefaultLogger) Debug(ctx context.Context, msg string, attrs ...slog.Attr) {
+	s.getSlogLogger().DebugContext(ctx, msg, s.toAnyArray(attrs)...)
 }
 
-func (s slogDefaultLogger) Info(ctx context.Context, msg string) {
-	s.getSlogLogger().InfoContext(ctx, msg)
+func (s slogDefaultLogger) Info(ctx context.Context, msg string, attrs ...slog.Attr) {
+	s.getSlogLogger().InfoContext(ctx, msg, s.toAnyArray(attrs)...)
 }
 
-func (s slogDefaultLogger) Warn(ctx context.Context, err error) {
-	s.getSlogLogger().WarnContext(ctx, err.Error())
+func (s slogDefaultLogger) Warn(ctx context.Context, err error, attrs ...slog.Attr) {
+	s.getSlogLogger().WarnContext(ctx, err.Error(), s.toAnyArray(attrs)...)
 }
 
-func (s slogDefaultLogger) Warnf(ctx context.Context, format string, args ...any) {
-	s.getSlogLogger().WarnContext(ctx, fmt.Sprintf(format, args...))
+func (s slogDefaultLogger) Error(ctx context.Context, err error, attrs ...slog.Attr) {
+	s.getSlogLogger().ErrorContext(ctx, err.Error(), s.toAnyArray(attrs)...)
 }
 
-func (s slogDefaultLogger) Error(ctx context.Context, err error) {
-	s.getSlogLogger().ErrorContext(ctx, err.Error())
-}
+func (s slogDefaultLogger) toAnyArray(attrs []slog.Attr) []any {
+	if attrs == nil {
+		return nil
+	}
 
-func (s slogDefaultLogger) Errorf(ctx context.Context, format string, args ...any) {
-	s.getSlogLogger().ErrorContext(ctx, fmt.Sprintf(format, args...))
+	anyAttrs := make([]any, len(attrs))
+	for i, attr := range attrs {
+		anyAttrs[i] = attr
+	}
+
+	return anyAttrs
 }

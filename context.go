@@ -1,6 +1,9 @@
 package logs
 
-import "context"
+import (
+	"context"
+	"log/slog"
+)
 
 type contextKey uint8
 
@@ -24,31 +27,21 @@ func FromContext(ctx context.Context) Logger {
 }
 
 // Debug logs a message as debug level using Logger obtained from FromContext.
-func Debug(ctx context.Context, msg string) {
-	FromContext(ctx).Debug(ctx, msg)
+func Debug(ctx context.Context, msg string, attrs ...slog.Attr) {
+	FromContext(ctx).Debug(ctx, msg, attrs...)
 }
 
 // Info logs a message as info level using Logger obtained from FromContext.
-func Info(ctx context.Context, msg string) {
-	FromContext(ctx).Info(ctx, msg)
+func Info(ctx context.Context, msg string, attrs ...slog.Attr) {
+	FromContext(ctx).Info(ctx, msg, attrs...)
 }
 
 // Warn logs an error as warn level using Logger obtained from FromContext.
-func Warn(ctx context.Context, err error) {
-	FromContext(ctx).Warn(ctx, err)
-}
-
-// Warnf logs an error as warn level using Logger obtained from FromContext.
-func Warnf(ctx context.Context, format string, args ...any) {
-	FromContext(ctx).Warnf(ctx, format, args...)
+func Warn(ctx context.Context, err error, attrs ...slog.Attr) {
+	FromContext(ctx).Warn(ctx, err, attrs...)
 }
 
 // Error logs an error as error level using Logger obtained from FromContext.
-func Error(ctx context.Context, err error) {
-	FromContext(ctx).Error(ctx, err)
-}
-
-// Errorf logs an error as error level using Logger obtained from FromContext.
-func Errorf(ctx context.Context, format string, args ...any) {
-	FromContext(ctx).Errorf(ctx, format, args...)
+func Error(ctx context.Context, err error, attrs ...slog.Attr) {
+	FromContext(ctx).Error(ctx, err, attrs...)
 }
