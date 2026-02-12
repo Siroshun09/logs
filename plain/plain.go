@@ -21,37 +21,37 @@ func NewPlainLogger(writer io.Writer, option *Option) logs.Logger {
 		opt = *option
 	}
 
-	return &writerLogger{
+	return &plainLogger{
 		writer: writer,
 		opt:    opt,
 	}
 }
 
-type writerLogger struct {
+type plainLogger struct {
 	writer io.Writer
 	opt    Option
 }
 
-func (w *writerLogger) Debug(_ context.Context, msg string, attrs ...slog.Attr) {
+func (w *plainLogger) Debug(_ context.Context, msg string, attrs ...slog.Attr) {
 	if !w.opt.Debug {
 		return
 	}
 	w.println("DEBUG", msg, attrs...)
 }
 
-func (w *writerLogger) Info(_ context.Context, msg string, attrs ...slog.Attr) {
+func (w *plainLogger) Info(_ context.Context, msg string, attrs ...slog.Attr) {
 	w.println("INFO", msg, attrs...)
 }
 
-func (w *writerLogger) Warn(_ context.Context, err error, attrs ...slog.Attr) {
+func (w *plainLogger) Warn(_ context.Context, err error, attrs ...slog.Attr) {
 	w.println("WARN", err.Error(), attrs...)
 }
 
-func (w *writerLogger) Error(_ context.Context, err error, attrs ...slog.Attr) {
+func (w *plainLogger) Error(_ context.Context, err error, attrs ...slog.Attr) {
 	w.println("ERROR", err.Error(), attrs...)
 }
 
-func (w *writerLogger) println(level string, msg string, attrs ...slog.Attr) {
+func (w *plainLogger) println(level string, msg string, attrs ...slog.Attr) {
 	if w.opt.PrintLevel {
 		_, _ = fmt.Fprint(w.writer, level+": ")
 	}

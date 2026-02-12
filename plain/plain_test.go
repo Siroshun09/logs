@@ -11,7 +11,7 @@ import (
 	"github.com/Siroshun09/logs/v2/plain"
 )
 
-func Test_writerLogger_Debug(t *testing.T) {
+func Test_plainLogger_Debug(t *testing.T) {
 	tests := []struct {
 		name        string
 		opt         *plain.Option
@@ -127,13 +127,13 @@ func Test_writerLogger_Debug(t *testing.T) {
 			tt.call(t.Context(), plain.NewPlainLogger(&b, tt.opt))
 
 			if b.String() != tt.expectedLog {
-				t.Errorf("writerLogger.Debug() = %v, want %v", b.String(), tt.expectedLog)
+				t.Errorf("plainLogger.Debug() = %v, want %v", b.String(), tt.expectedLog)
 			}
 		})
 	}
 }
 
-func Test_writerLogger_Info(t *testing.T) {
+func Test_plainLogger_Info(t *testing.T) {
 	tests := []struct {
 		name        string
 		opt         *plain.Option
@@ -223,13 +223,13 @@ func Test_writerLogger_Info(t *testing.T) {
 			tt.call(t.Context(), plain.NewPlainLogger(&b, tt.opt))
 
 			if b.String() != tt.expectedLog {
-				t.Errorf("writerLogger.Info() = %v, want %v", b.String(), tt.expectedLog)
+				t.Errorf("plainLogger.Info() = %v, want %v", b.String(), tt.expectedLog)
 			}
 		})
 	}
 }
 
-func Test_writerLogger_Warn(t *testing.T) {
+func Test_plainLogger_Warn(t *testing.T) {
 	err := errors.New("test error")
 	tests := []struct {
 		name        string
@@ -320,13 +320,13 @@ func Test_writerLogger_Warn(t *testing.T) {
 			tt.call(t.Context(), plain.NewPlainLogger(&b, tt.opt))
 
 			if b.String() != tt.expectedLog {
-				t.Errorf("writerLogger.Warn() = %v, want %v", b.String(), tt.expectedLog)
+				t.Errorf("plainLogger.Warn() = %v, want %v", b.String(), tt.expectedLog)
 			}
 		})
 	}
 }
 
-func Test_writerLogger_Error(t *testing.T) {
+func Test_plainLogger_Error(t *testing.T) {
 	err := errors.New("test error")
 	tests := []struct {
 		name        string
@@ -417,7 +417,7 @@ func Test_writerLogger_Error(t *testing.T) {
 			tt.call(t.Context(), plain.NewPlainLogger(&b, tt.opt))
 
 			if b.String() != tt.expectedLog {
-				t.Errorf("writerLogger.Error() = %v, want %v", b.String(), tt.expectedLog)
+				t.Errorf("plainLogger.Error() = %v, want %v", b.String(), tt.expectedLog)
 			}
 		})
 	}
