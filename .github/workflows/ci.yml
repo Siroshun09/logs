@@ -5,7 +5,7 @@ permissions:
 
 jobs:
   build-matrix:
-    name: Define Go Versions
+    name: Build Matrix
     runs-on: ubuntu-latest
     outputs:
       go-versions: ${{ steps.define-go-versions.outputs.go-versions }}
