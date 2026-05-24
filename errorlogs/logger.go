@@ -32,8 +32,8 @@ type Option struct {
 	PrintCurrentStackTraceIfNotAttached bool
 	// StackTraceAttrKey is the key of the stack trace attribute.
 	StackTraceAttrKey string
-	// IncludeErrorAttrs is whether to include attributes in serrors
-	IncludeErrorAttrs bool
+	// ErrorAttrsFunc is the function to modify the attributes of the error.
+	ErrorAttrsFunc func(err error, attrs []slog.Attr) []slog.Attr
 }
 
 type logger struct {
@@ -91,15 +91,20 @@ func (l *logger) appendAttrs(attrs []slog.Attr, err error, includeStackTrace boo
 		}
 	}
 
-	if l.opt.IncludeErrorAttrs {
-		ret = slices.AppendSeq(ret, func(yield func(slog.Attr) bool) {
-			for _, attr := range serrors.GetAttrs(err) {
-				if !yield(attr) {
-					break
-				}
+	errAttrs := slices.Collect(func(yield func(slog.Attr) bool) {
+		for _, attr := range serrors.GetAttrs(err) {
+			if !yield(attr) {
+				break
 			}
-		})
-		_ = ret
+		}
+	})
+
+	if l.opt.ErrorAttrsFunc != nil {
+		errAttrs = l.opt.ErrorAttrsFunc(err, errAttrs)
+	}
+
+	if len(errAttrs) > 0 {
+		ret = append(ret, errAttrs...)
 	}
 
 	return ret

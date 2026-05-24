@@ -152,17 +152,23 @@ type testCase struct {
 func testCases() iter.Seq[testCase] {
 	boolMatrix := []bool{true, false}
 	stackTraceKeyMatrix := []string{"", errorlogs.DefaultStackTraceAttrKey, "custom_stacktrace_key"}
+	errorAttrsFuncs := []func(err error, attrs []slog.Attr) []slog.Attr{
+		nil,
+		func(err error, attrs []slog.Attr) []slog.Attr {
+			return nil // filter all attrs
+		},
+	}
 
 	opts := []*errorlogs.Option{nil}
 	for _, printStackTraceOnWarn := range boolMatrix {
 		for _, printCurrentStackTraceIfNotAttached := range boolMatrix {
 			for _, stackTraceKey := range stackTraceKeyMatrix {
-				for _, includeErrorAttrs := range boolMatrix {
+				for _, errorAttrsFunc := range errorAttrsFuncs {
 					opts = append(opts, &errorlogs.Option{
 						PrintStackTraceOnWarn:               printStackTraceOnWarn,
 						PrintCurrentStackTraceIfNotAttached: printCurrentStackTraceIfNotAttached,
 						StackTraceAttrKey:                   stackTraceKey,
-						IncludeErrorAttrs:                   includeErrorAttrs,
+						ErrorAttrsFunc:                      errorAttrsFunc,
 					})
 				}
 			}
@@ -227,7 +233,9 @@ func createAttrsMatcher(t *testing.T, err error, attrs []slog.Attr, printStackTr
 			}
 		}
 
-		if opt != nil && opt.IncludeErrorAttrs {
+		if opt != nil && opt.ErrorAttrsFunc != nil {
+			assert.Empty(t, got)
+		} else {
 			expectedAttrs := slices.Collect(func(yield func(attr slog.Attr) bool) {
 				for _, attr := range serrors.GetAttrs(err) {
 					require.True(t, yield(attr))
@@ -239,8 +247,6 @@ func createAttrsMatcher(t *testing.T, err error, attrs []slog.Attr, printStackTr
 			} else {
 				assert.Equal(t, expectedAttrs, got)
 			}
-		} else {
-			assert.Empty(t, got)
 		}
 
 		return true
