@@ -13,6 +13,10 @@ const DefaultStackTraceAttrKey = "stack_trace"
 
 // NewLogger creates a new logs.Logger.
 func NewLogger(out logs.Logger, option *Option) logs.Logger {
+	if out == nil {
+		panic("out cannot be nil")
+	}
+
 	opt := Option{}
 	if option != nil {
 		opt = *option

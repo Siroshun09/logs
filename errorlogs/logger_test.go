@@ -10,11 +10,51 @@ import (
 
 	"github.com/Siroshun09/logs/errorlogs/v2"
 	"github.com/Siroshun09/logs/logmock/v2"
+	"github.com/Siroshun09/logs/v2"
 	"github.com/Siroshun09/serrors/v2"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/mock/gomock"
 )
+
+func TestNewLogger(t *testing.T) {
+	tests := []struct {
+		name           string
+		out            logs.Logger
+		option         *errorlogs.Option
+		panicAssertion assert.PanicAssertionFunc
+	}{
+		{
+			name: "success",
+			out:  logmock.NewMockLogger(gomock.NewController(t)),
+			option: &errorlogs.Option{
+				PrintStackTraceOnWarn: true,
+			},
+			panicAssertion: assert.NotPanics,
+		},
+		{
+			name:           "nil option",
+			out:            logmock.NewMockLogger(gomock.NewController(t)),
+			option:         nil,
+			panicAssertion: assert.NotPanics,
+		},
+		{
+			name: "nil logger",
+			out:  nil,
+			option: &errorlogs.Option{
+				PrintStackTraceOnWarn: true,
+			},
+			panicAssertion: assert.Panics,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			tt.panicAssertion(t, func() {
+				errorlogs.NewLogger(tt.out, tt.option)
+			})
+		})
+	}
+}
 
 func TestNilLogger(t *testing.T) {
 	l := errorlogs.NewNilLogger()

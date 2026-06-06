@@ -9,10 +9,21 @@ import (
 )
 
 func TestWithContext(t *testing.T) {
-	ctx := WithContext(context.Background(), Default())
-	if _, ok := ctx.Value(loggerKey).(Logger); !ok {
-		t.Errorf("logger not found in context")
-	}
+	t.Run("success", func(t *testing.T) {
+		ctx := WithContext(t.Context(), Default())
+		if _, ok := ctx.Value(loggerKey).(Logger); !ok {
+			t.Errorf("logger not found in context")
+		}
+	})
+
+	t.Run("nil", func(t *testing.T) {
+		defer func() {
+			if r := recover(); r == nil {
+				t.Errorf("The code did not panic")
+			}
+		}()
+		WithContext(t.Context(), nil)
+	})
 }
 
 func TestFromContext(t *testing.T) {
@@ -40,7 +51,7 @@ func TestFromContext(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			ctx := tt.ctxFunc(context.Background())
+			ctx := tt.ctxFunc(t.Context())
 			if got := FromContext(ctx); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("WithContext() = %v, want %v", got, tt.want)
 			}

@@ -13,6 +13,9 @@ const (
 
 // WithContext puts the Logger into context.Context.
 func WithContext(ctx context.Context, logger Logger) context.Context {
+	if logger == nil {
+		panic("logger cannot be nil")
+	}
 	return context.WithValue(ctx, loggerKey, logger)
 }
 
