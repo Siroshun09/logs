@@ -22,30 +22,17 @@ func (s slogDefaultLogger) getSlogLogger() *slog.Logger {
 }
 
 func (s slogDefaultLogger) Debug(ctx context.Context, msg string, attrs ...slog.Attr) {
-	s.getSlogLogger().DebugContext(ctx, msg, s.toAnyArray(attrs)...)
+	s.getSlogLogger().LogAttrs(ctx, slog.LevelDebug, msg, attrs...)
 }
 
 func (s slogDefaultLogger) Info(ctx context.Context, msg string, attrs ...slog.Attr) {
-	s.getSlogLogger().InfoContext(ctx, msg, s.toAnyArray(attrs)...)
+	s.getSlogLogger().LogAttrs(ctx, slog.LevelInfo, msg, attrs...)
 }
 
 func (s slogDefaultLogger) Warn(ctx context.Context, err error, attrs ...slog.Attr) {
-	s.getSlogLogger().WarnContext(ctx, err.Error(), s.toAnyArray(attrs)...)
+	s.getSlogLogger().LogAttrs(ctx, slog.LevelWarn, err.Error(), attrs...)
 }
 
 func (s slogDefaultLogger) Error(ctx context.Context, err error, attrs ...slog.Attr) {
-	s.getSlogLogger().ErrorContext(ctx, err.Error(), s.toAnyArray(attrs)...)
-}
-
-func (s slogDefaultLogger) toAnyArray(attrs []slog.Attr) []any {
-	if attrs == nil {
-		return nil
-	}
-
-	anyAttrs := make([]any, len(attrs))
-	for i, attr := range attrs {
-		anyAttrs[i] = attr
-	}
-
-	return anyAttrs
+	s.getSlogLogger().LogAttrs(ctx, slog.LevelError, err.Error(), attrs...)
 }
