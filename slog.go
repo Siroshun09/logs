@@ -30,9 +30,16 @@ func (s slogDefaultLogger) Info(ctx context.Context, msg string, attrs ...slog.A
 }
 
 func (s slogDefaultLogger) Warn(ctx context.Context, err error, attrs ...slog.Attr) {
-	s.getSlogLogger().LogAttrs(ctx, slog.LevelWarn, err.Error(), attrs...)
+	s.getSlogLogger().LogAttrs(ctx, slog.LevelWarn, errString(err), attrs...)
 }
 
 func (s slogDefaultLogger) Error(ctx context.Context, err error, attrs ...slog.Attr) {
-	s.getSlogLogger().LogAttrs(ctx, slog.LevelError, err.Error(), attrs...)
+	s.getSlogLogger().LogAttrs(ctx, slog.LevelError, errString(err), attrs...)
+}
+
+func errString(err error) string {
+	if err == nil {
+		return "<nil>"
+	}
+	return err.Error()
 }

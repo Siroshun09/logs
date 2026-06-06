@@ -138,12 +138,32 @@ func Test_slogDefaultLogger_Log(t *testing.T) {
 			},
 		},
 		{
+			name: "success: warn with nil error",
+			f: func(ctx context.Context) {
+				logger.Warn(ctx, nil)
+			},
+			expectedRecord: slog.Record{
+				Message: "<nil>",
+				Level:   slog.LevelWarn,
+			},
+		},
+		{
 			name: "success: error",
 			f: func(ctx context.Context) {
 				logger.Error(ctx, errors.New("error"))
 			},
 			expectedRecord: slog.Record{
 				Message: "error",
+				Level:   slog.LevelError,
+			},
+		},
+		{
+			name: "success: error with nil error",
+			f: func(ctx context.Context) {
+				logger.Error(ctx, nil)
+			},
+			expectedRecord: slog.Record{
+				Message: "<nil>",
 				Level:   slog.LevelError,
 			},
 		},

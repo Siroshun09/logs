@@ -246,6 +246,14 @@ func Test_plainLogger_Warn(t *testing.T) {
 			expectedLog: "test error\n",
 		},
 		{
+			name: "nil error -> printed as <nil>",
+			opt:  nil,
+			call: func(ctx context.Context, logger logs.Logger) {
+				logger.Warn(ctx, nil)
+			},
+			expectedLog: "<nil>\n",
+		},
+		{
 			name: "empty option -> printed",
 			opt:  &plain.Option{},
 			call: func(ctx context.Context, logger logs.Logger) {
@@ -341,6 +349,14 @@ func Test_plainLogger_Error(t *testing.T) {
 				logger.Error(ctx, err)
 			},
 			expectedLog: "test error\n",
+		},
+		{
+			name: "nil error -> printed as <nil>",
+			opt:  nil,
+			call: func(ctx context.Context, logger logs.Logger) {
+				logger.Error(ctx, nil)
+			},
+			expectedLog: "<nil>\n",
 		},
 		{
 			name: "empty option -> printed",

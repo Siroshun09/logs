@@ -44,11 +44,18 @@ func (w *plainLogger) Info(_ context.Context, msg string, attrs ...slog.Attr) {
 }
 
 func (w *plainLogger) Warn(_ context.Context, err error, attrs ...slog.Attr) {
-	w.println("WARN", err.Error(), attrs...)
+	w.println("WARN", errString(err), attrs...)
 }
 
 func (w *plainLogger) Error(_ context.Context, err error, attrs ...slog.Attr) {
-	w.println("ERROR", err.Error(), attrs...)
+	w.println("ERROR", errString(err), attrs...)
+}
+
+func errString(err error) string {
+	if err == nil {
+		return "<nil>"
+	}
+	return err.Error()
 }
 
 func (w *plainLogger) println(level string, msg string, attrs ...slog.Attr) {
