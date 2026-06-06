@@ -3,7 +3,6 @@ package errorlogs
 import (
 	"context"
 	"log/slog"
-	"slices"
 
 	"github.com/Siroshun09/logs/v2"
 	"github.com/Siroshun09/serrors/v2"
@@ -91,21 +90,14 @@ func (l *logger) appendAttrs(attrs []slog.Attr, err error, includeStackTrace boo
 		}
 	}
 
-	errAttrs := slices.Collect(func(yield func(slog.Attr) bool) {
-		for _, attr := range serrors.GetAttrs(err) {
-			if !yield(attr) {
-				break
-			}
-		}
-	})
+	var errAttrs []slog.Attr
+	for _, attr := range serrors.GetAttrs(err) {
+		errAttrs = append(errAttrs, attr)
+	}
 
 	if l.opt.ErrorAttrsFunc != nil {
 		errAttrs = l.opt.ErrorAttrsFunc(err, errAttrs)
 	}
 
-	if len(errAttrs) > 0 {
-		ret = append(ret, errAttrs...)
-	}
-
-	return ret
+	return append(ret, errAttrs...)
 }

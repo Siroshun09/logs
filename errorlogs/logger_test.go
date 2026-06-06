@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"iter"
 	"log/slog"
-	"slices"
 	"testing"
 
 	"github.com/Siroshun09/logs/errorlogs/v2"
@@ -236,11 +235,10 @@ func createAttrsMatcher(t *testing.T, err error, attrs []slog.Attr, printStackTr
 		if opt != nil && opt.ErrorAttrsFunc != nil {
 			assert.Empty(t, got)
 		} else {
-			expectedAttrs := slices.Collect(func(yield func(attr slog.Attr) bool) {
-				for _, attr := range serrors.GetAttrs(err) {
-					require.True(t, yield(attr))
-				}
-			})
+			var expectedAttrs []slog.Attr
+			for _, attr := range serrors.GetAttrs(err) {
+				expectedAttrs = append(expectedAttrs, attr)
+			}
 
 			if len(expectedAttrs) == 0 {
 				assert.Empty(t, got)
