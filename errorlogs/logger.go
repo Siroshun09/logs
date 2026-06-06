@@ -3,6 +3,7 @@ package errorlogs
 import (
 	"context"
 	"log/slog"
+	"slices"
 
 	"github.com/Siroshun09/logs/v2"
 	"github.com/Siroshun09/serrors/v2"
@@ -75,7 +76,8 @@ func (l *logger) Error(ctx context.Context, err error, attrs ...slog.Attr) {
 }
 
 func (l *logger) appendAttrs(attrs []slog.Attr, err error, includeStackTrace bool) []slog.Attr {
-	ret := attrs
+	// Clip so that appending never mutates the caller's backing array.
+	ret := slices.Clip(attrs)
 
 	if includeStackTrace {
 		key := l.opt.StackTraceAttrKey
