@@ -12,7 +12,7 @@ jobs:
       module-paths: ${{ steps.define-modules.outputs.module_paths }}
     steps:
       - id: define-go-versions
-        run: echo 'go-versions=[ "1.24", "1.25", "1.26" ]' >> "$GITHUB_OUTPUT"
+        run: echo 'go-versions=[ "1.24", "1.25", "1.26", "1.27" ]' >> "$GITHUB_OUTPUT"
       - id: define-modules
         run: echo 'module_paths=[ "./", "./logmock", "./errorlogs" ]' >> "$GITHUB_OUTPUT"
 
